@@ -10,7 +10,7 @@ const anime = {
 
 describe("Anime Component", () => {
     test("Display title and image with data", async () => {
-        const { getByText, getByTestId } = render(AnimeComponent, {
+        const { getByText, getByRole, getByTestId } = render(AnimeComponent, {
             ...anime,
         });
         await waitFor(() => getByText(anime.title));

@@ -1,5 +1,6 @@
 import { apiRequest } from "$lib/api.util";
-import { addFavorite, deleteFavorite } from "$lib/pocketbase/favorites";
+import { addFavorite, deleteFavorite } from "$lib/favorites.utils";
+// import { addFavorite, deleteFavorite } from "$lib/pocketbase/favorites";
 import type { Actions, PageServerLoad } from "./$types";
 import { z } from "zod";
 

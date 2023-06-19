@@ -6,6 +6,7 @@ services:
       context: ./client
     working_dir: /app
     environment:
+      - SOLACE_BACKEND_URL=server
       - SOLACE_BACKEND_PORT=8080
       - SOLACE_POCKETBASE_URL=pocketbase
     volumes:
@@ -14,14 +15,43 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - pocketbase
-  pocketbase:
-    container_name: task-pocketbase
+      - server
+      # - pocketbase
+  # pocketbase:
+  #   container_name: task-pocketbase
+  #   build:
+  #     context: ./pocketbase
+  #   working_dir: /pb
+  #   volumes:
+  #     - ./pocketbase/pb_data:/pb/pb_data
+  #     - ./pocketbase/pb_migrations:/pb/pb_migrations
+  #   ports:
+  #     - 8080:8080
+  server:
+    container_name: task-server
     build:
-      context: ./pocketbase
-    working_dir: /pb
-    volumes:
-      - ./pocketbase/pb_data:/pb/pb_data
-      - ./pocketbase/pb_migrations:/pb/pb_migrations
+      context: ./backend
+    working_dir: /backend
+    environment:
+      - db_name=solace_test
+      - db_user=root
+      - db_type=mysql
+      - db_host=mysql
+      - db_port=3306
+      - charset=utf8
+      - parse_time=True
+      - web_port=8080
+      - prefix=/api
     ports:
       - 8080:8080
+    depends_on:
+      - mysql
+  mysql:
+    build:
+      context: ./mysql # Path to the directory containing the MySQL Dockerfile
+    ports:
+      - 3306:3306 # Port mapping for MySQL
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"

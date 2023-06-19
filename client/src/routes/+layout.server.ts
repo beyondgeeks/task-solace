@@ -1,4 +1,5 @@
-import { getFavorites } from "$lib/pocketbase/favorites";
+import { getFavorites } from "$lib/favorites.utils";
+// import { getFavorites } from "$lib/pocketbase/favorites";
 import type { LayoutServerLoad } from "./$types";
 
 export const load = (async () => {
