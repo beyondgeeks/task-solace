@@ -1,6 +1,8 @@
 import { apiRequest } from "$lib/api.util";
-import favorites from "$lib/data/favorites";
+import { addFavorite, deleteFavorite } from "$lib/favorites.utils";
+// import { addFavorite, deleteFavorite } from "$lib/pocketbase/favorites";
 import type { Actions, PageServerLoad } from "./$types";
+import { z } from "zod";
 
 export type Anime = {
     data: {
@@ -13,8 +15,8 @@ export type Anime = {
                 small_image_url: string;
                 large_image_url: string;
             };
-        }
-    }
+        };
+    };
 };
 
 export const load = (async ({ params }) => {
@@ -25,15 +27,33 @@ export const load = (async ({ params }) => {
     };
 }) satisfies PageServerLoad;
 
+const createItemSchema = z.object({
+    mal_id: z.string().min(1),
+    title: z.string().min(1),
+    image: z.string().min(1),
+});
+
+const deleteItemSchema = z.object({
+    mal_id: z.string().min(1),
+});
+
 export const actions = {
     addToFavorites: async ({ request }) => {
         const form = await request.formData();
 
-        const mal_id = form.get("mal_id") as unknown as number;
-        const title = form.get("title") as unknown as string;
-        const image = form.get("image") as unknown as string;
+        const { mal_id, title, image } = createItemSchema.parse(
+            Object.fromEntries(form),
+        );
 
-        favorites.set(mal_id, { title: title, image: image });
+        await addFavorite({ mal_id: parseInt(mal_id), title, image });
+
+        return { success: true };
+    },
+    deleteFromFavorites: async ({ request }) => {
+        const form = await request.formData();
+
+        const { mal_id } = deleteItemSchema.parse(Object.fromEntries(form));
+        await deleteFavorite(mal_id);
 
         return { success: true };
     },

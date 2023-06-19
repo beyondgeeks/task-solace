@@ -1,6 +1,10 @@
 import { apiRequest } from "../lib/api.util";
 import type { Actions, PageServerLoad } from "./$types";
 
+import dotenv from "dotenv";
+
+dotenv.config();
+
 type RecommendedAnime = {
     data: {
         content: string;
